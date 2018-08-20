@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csrc.mapper.ReadVillageAddressMapper">
+
+  <insert id="importIntoDb" parameterType="java.util.List">
+    insert into villageAddress (noNum, addressName) values
+    <foreach collection ="list" item="node" index= "index" separator =",">
+      (#{node.noNum},#{node.addressName})
+    </foreach>
+  </insert>
+
+  <delete id="deleteAll" >
+    delete from villageAddress where 1=1
+  </delete>
+
+</mapper>
