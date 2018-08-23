@@ -1,9 +1,11 @@
 package com.csrc.controller;
 
+import com.csrc.es.VillageInterfaceImpl;
 import com.csrc.mapper.ReadAddressMapper;
 import com.csrc.mapper.ReadVillageAddressMapper;
 import com.csrc.model.AddressNode;
 import com.csrc.model.VillageAddressNode;
+import com.csrc.model.VillageAddressNodeEs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +28,9 @@ public class ReadAddressController {
 
     @Autowired
     ReadVillageAddressMapper readVillageAddressMapper;
+
+    @Autowired
+    VillageInterfaceImpl villageInterface;
 
     @RequestMapping("/readAddress")
     public void readAddress() throws InterruptedException {
@@ -83,28 +88,50 @@ public class ReadAddressController {
         File file=new File("F:\\bb.txt");
         BufferedReader reader=null;
         String temp=null;
-        String firstScope="";
-        String secondScope="";
-        String thirdScope="";
-        String fourScope="";
+        String provAddrNo="";
+        String cityAddrNo="";
+        String areaAddrNo="";
+        String townAddrNo="";
+        String villageAddrNo="";
+        String provAddr="";
+        String cityAddr="";
+        String areaAddr="";
+        String townAddr="";
+        String villageAddr="";
 
-        List<VillageAddressNode> list=new ArrayList<VillageAddressNode>();
+        List<VillageAddressNodeEs> list=new ArrayList<VillageAddressNodeEs>();
         try{
             reader=new BufferedReader(new FileReader(file));
             while((temp=reader.readLine())!=null){
                 String[] tempArr=temp.split("@@");
                 if(tempArr[2].equals("1")){
-                    firstScope=tempArr[1];
+                    provAddr=tempArr[1];
+                    provAddrNo=tempArr[0];
                 }else if(tempArr[2].equals("2")){
-                    secondScope=tempArr[1];
+                    cityAddr=tempArr[1];
+                    cityAddrNo=tempArr[0];
                 }else if(tempArr[2].equals("3")){
-                    thirdScope=tempArr[1];
+                    areaAddr=tempArr[1];
+                    areaAddrNo=tempArr[0];
                 }else if(tempArr[2].equals("4")){
-                    fourScope=tempArr[1];
+                    townAddr=tempArr[1];
+                    townAddrNo=tempArr[0];
                 }else {
-                    VillageAddressNode node=new VillageAddressNode();
-                    node.setNoNum(tempArr[0]);
-                    node.setAddressName(firstScope+secondScope+thirdScope+fourScope+tempArr[1]);
+                    villageAddr=tempArr[1];
+                    villageAddrNo=tempArr[0];
+
+                    VillageAddressNodeEs node=new VillageAddressNodeEs();
+                    node.setAreaAddr(areaAddr);
+                    node.setAreaAddrNo(areaAddrNo);
+                    node.setCityAddr(cityAddr);
+                    node.setCityAddrNo(cityAddrNo);
+                    node.setProvAddr(provAddr);
+                    node.setProvAddrNo(provAddrNo);
+                    node.setTownAddr(townAddr);
+                    node.setTownAddrNo(townAddrNo);
+                    node.setVillageAddr(villageAddr);
+                    node.setVillageAddrNo(villageAddrNo);
+                    node.setFullAddressName(provAddr+cityAddr+areaAddr+townAddr+tempArr[1]);
                     list.add(node);
                 }
             }
@@ -127,48 +154,13 @@ public class ReadAddressController {
         System.out.println("开始分段执行");
         while(lineNum<list.size()){
             System.out.println("开始linNum:"+lineNum);
-            List<VillageAddressNode> listTemp=list.subList(lineNum,(list.size()-lineNum>10000)?lineNum+10000:list.size());
-            readVillageAddressMapper.importIntoDb(listTemp);
+            List<VillageAddressNodeEs> listTemp=list.subList(lineNum,(list.size()-lineNum>10000)?lineNum+10000:list.size());
+            //readVillageAddressMapper.importIntoDb(listTemp);//存入结构化数据库中，但是暂时用不到
+            villageInterface.saveEntity(listTemp);
             System.out.println("结束linNum:"+lineNum);
-            Thread.sleep(4000);
+            Thread.sleep(5000);
             lineNum+=10000;
         }
         System.out.println("处理结束："+df.format(new Date()));
     }
 }
-
-
-
-
-
-/*@RestController
-public class ReadAddressController {
-    @RequestMapping("/readAddress")
-    public void readAddress(){
-        File file=new File("F:\\aa.txt");
-        BufferedReader reader=null;
-        String temp=null;
-        int line=1;
-        try{
-            reader=new BufferedReader(new FileReader(file));
-            while((temp=reader.readLine())!=null){
-                System.out.println("line"+line+":"+temp);
-                System.out.println("季安安");
-                line++;
-            }
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        finally{
-            if(reader!=null){
-                try{
-                    reader.close();
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-}*/
