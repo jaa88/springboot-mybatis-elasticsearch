@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by jianan on 2018/6/11.
  */
-public interface ReadAddressMapper {
+public interface AddressMapper {
     public int importIntoDb(List<AddressNode> list);
 
 }

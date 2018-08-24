@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.csrc.mapper.ReadAddressMapper">
+<mapper namespace="com.csrc.mapper.AddressMapper">
 
   <insert id="importIntoDb" parameterType="java.util.List">
-    insert into address (noNum, addressName, addressLevel, addressLevelName) values
+    insert into villageAddress (noNum, addressName) values
     <foreach collection ="list" item="node" index= "index" separator =",">
-      (#{node.noNum},#{node.addressName},#{node.addressLevel},#{node.addressLevelName})
+      (#{node.noNum},#{node.addressName})
     </foreach>
   </insert>
 
   <delete id="deleteAll" >
-    delete from attributeNode where 1=1
+    delete from villageAddress where 1=1
   </delete>
 
 </mapper>

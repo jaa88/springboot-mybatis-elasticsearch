@@ -1,6 +1,6 @@
 package com.csrc.es;
 
-import com.csrc.model.VillageAddressNodeEs;
+import com.csrc.model.AddressNode;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -20,15 +20,15 @@ import java.util.List;
  * Created by jianan on 2018/8/23.
  */
 @Service
-public class VillageInterfaceImpl implements VillageInterface {
-    private static final Logger LOGGER = LoggerFactory.getLogger(VillageInterfaceImpl.class);
+public class AddressInterfaceImpl implements AddressInterface {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AddressInterfaceImpl.class);
 
     @Autowired
     private JestClient jestClient;
 
     @Override
-    public void saveEntity(VillageAddressNodeEs entity) {
-        Index index = new Index.Builder(entity).index(VillageAddressNodeEs.INDEX_NAME).type(VillageAddressNodeEs.TYPE).build();
+    public void saveEntity(AddressNode entity) {
+        Index index = new Index.Builder(entity).index(AddressNode.INDEX_NAME).type(AddressNode.TYPE).build();
         try {
             jestClient.execute(index);
             LOGGER.info("ES 插入完成");
@@ -43,10 +43,10 @@ public class VillageInterfaceImpl implements VillageInterface {
      * 批量保存内容到ES
      */
     @Override
-    public void saveEntity(List<VillageAddressNodeEs> entityList) {
+    public void saveEntity(List<AddressNode> entityList) {
         Bulk.Builder bulk = new Bulk.Builder();
-        for(VillageAddressNodeEs entity : entityList) {
-            Index index = new Index.Builder(entity).index(VillageAddressNodeEs.INDEX_NAME).type(VillageAddressNodeEs.TYPE).build();
+        for(AddressNode entity : entityList) {
+            Index index = new Index.Builder(entity).index(AddressNode.INDEX_NAME).type(AddressNode.TYPE).build();
             bulk.addAction(index);
         }
         try {
@@ -62,14 +62,14 @@ public class VillageInterfaceImpl implements VillageInterface {
      * 在ES中搜索内容
      */
     @Override
-    public List<VillageAddressNodeEs> searchEntity(String searchContent){
+    public List<AddressNode> searchEntity(String searchContent){
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(QueryBuilders.matchQuery("fullAddressName",searchContent));
         Search search = new Search.Builder(searchSourceBuilder.toString())
-                .addIndex(VillageAddressNodeEs.INDEX_NAME).addType(VillageAddressNodeEs.TYPE).build();
+                .addIndex(AddressNode.INDEX_NAME).addType(AddressNode.TYPE).build();
         try {
             JestResult result = jestClient.execute(search);
-            return result.getSourceAsObjectList(VillageAddressNodeEs.class);
+            return result.getSourceAsObjectList(AddressNode.class);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             e.printStackTrace();

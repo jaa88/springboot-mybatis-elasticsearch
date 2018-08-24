@@ -1,11 +1,8 @@
 package com.csrc.controller;
 
-import com.csrc.es.VillageInterfaceImpl;
-import com.csrc.mapper.ReadAddressMapper;
-import com.csrc.mapper.ReadVillageAddressMapper;
+import com.csrc.es.AddressInterfaceImpl;
+import com.csrc.mapper.AddressMapper;
 import com.csrc.model.AddressNode;
-import com.csrc.model.VillageAddressNode;
-import com.csrc.model.VillageAddressNodeEs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,68 +21,16 @@ import java.util.List;
 @RestController
 public class ReadAddressController {
     @Autowired
-    ReadAddressMapper readAddressMapper;
+    AddressMapper addressMapper;
 
     @Autowired
-    ReadVillageAddressMapper readVillageAddressMapper;
-
-    @Autowired
-    VillageInterfaceImpl villageInterface;
+    AddressInterfaceImpl addressInterfaceImpl;
 
     @RequestMapping("/readAddress")
-    public void readAddress() throws InterruptedException {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println("处理开始："+df.format(new Date()));
-        File file=new File("F:\\bb.txt");
-        BufferedReader reader=null;
-        String temp=null;
-
-        List<AddressNode> list=new ArrayList<AddressNode>();
-        try{
-            reader=new BufferedReader(new FileReader(file));
-            while((temp=reader.readLine())!=null){
-                String[] tempArr=temp.split("@@");
-                AddressNode node=new AddressNode();
-                node.setNoNum(tempArr[0]);
-                node.setAddressName(tempArr[1]);
-                node.setAddressLevel(tempArr[2]);
-                node.setAddressLevelName(tempArr[3]);
-                list.add(node);
-            }
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        finally{
-            if(reader!=null){
-                try{
-                    reader.close();
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
-        System.out.println("处理完成，共有多少数据："+list.size());
-        System.out.println("处理结束："+df.format(new Date()));
-        int lineNum=0;
-        System.out.println("开始分段执行");
-        while(lineNum<list.size()){
-            System.out.println("开始linNum:"+lineNum);
-            List<AddressNode> listTemp=list.subList(lineNum,(list.size()-lineNum>10000)?lineNum+10000:list.size());
-            readAddressMapper.importIntoDb(listTemp);
-            System.out.println("结束linNum:"+lineNum);
-            Thread.sleep(4000);
-            lineNum+=10000;
-        }
-    }
-
-
-    @RequestMapping("/readVillageAddress")
     public void readVillageAddress() throws InterruptedException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println("处理开始："+df.format(new Date()));
-        File file=new File("F:\\bb.txt");
+        File file=new File("F:\\address.txt");
         BufferedReader reader=null;
         String temp=null;
         String provAddrNo="";
@@ -99,7 +44,7 @@ public class ReadAddressController {
         String townAddr="";
         String villageAddr="";
 
-        List<VillageAddressNodeEs> list=new ArrayList<VillageAddressNodeEs>();
+        List<AddressNode> list=new ArrayList<AddressNode>();
         try{
             reader=new BufferedReader(new FileReader(file));
             while((temp=reader.readLine())!=null){
@@ -120,7 +65,7 @@ public class ReadAddressController {
                     villageAddr=tempArr[1];
                     villageAddrNo=tempArr[0];
 
-                    VillageAddressNodeEs node=new VillageAddressNodeEs();
+                    AddressNode node=new AddressNode();
                     node.setAreaAddr(areaAddr);
                     node.setAreaAddrNo(areaAddrNo);
                     node.setCityAddr(cityAddr);
@@ -131,7 +76,7 @@ public class ReadAddressController {
                     node.setTownAddrNo(townAddrNo);
                     node.setVillageAddr(villageAddr);
                     node.setVillageAddrNo(villageAddrNo);
-                    node.setFullAddressName(provAddr+cityAddr+areaAddr+townAddr+tempArr[1]);
+                    node.setFullAddressName(provAddr+cityAddr+areaAddr+townAddr+tempArr[1]);//数据库中存储的是5级全地址
                     list.add(node);
                 }
             }
@@ -154,12 +99,12 @@ public class ReadAddressController {
         System.out.println("开始分段执行");
         while(lineNum<list.size()){
             System.out.println("开始linNum:"+lineNum);
-            List<VillageAddressNodeEs> listTemp=list.subList(lineNum,(list.size()-lineNum>10000)?lineNum+10000:list.size());
-            //readVillageAddressMapper.importIntoDb(listTemp);//存入结构化数据库中，但是暂时用不到
-            villageInterface.saveEntity(listTemp);
+            List<AddressNode> listTemp=list.subList(lineNum,(list.size()-lineNum>10000)?lineNum+10000:list.size());
+            //addressMapper.importIntoDb(listTemp);//存入结构化数据库中，但是暂时用不到
+            addressInterfaceImpl.saveEntity(listTemp);//存入es中
             System.out.println("结束linNum:"+lineNum);
-            Thread.sleep(5000);
             lineNum+=10000;
+            Thread.sleep(5000);
         }
         System.out.println("处理结束："+df.format(new Date()));
     }
