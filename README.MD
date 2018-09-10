@@ -1,5 +1,5 @@
 # 使用步骤 #
-     1.安装elasticsearch，推荐es 5.6，因为版本不同可能部分api访问失败
+     1.安装elasticsearch，推荐es 5.6，因为版本不同可能部分api访问失败。在配置文件中配置相关地址
      2.执行localhost:7070/address/readAddress 五级地址信息放在resource下，另外，我是500条一执行（因为我给es分的内存只有 256mb，穷啊，买的1g内存的阿里云服务器，内存有限），请根据自己的内存，适当调高，一般本地测的时候，10000条/次导入es无压力。
      3.访问时，localhost:7070/address/searchAddress?addressName=********即可
 
