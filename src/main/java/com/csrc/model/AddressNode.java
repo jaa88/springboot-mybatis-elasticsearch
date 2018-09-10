@@ -19,6 +19,7 @@ public class AddressNode {
     private String townAddr;//镇
     private String villageAddrNo;
     private String villageAddr;//村
+    private Integer addressLevel;
 
     public AddressNode() {
         super();
@@ -110,5 +111,13 @@ public class AddressNode {
 
     public void setProvAddrNo(String provAddrNo) {
         this.provAddrNo = provAddrNo;
+    }
+
+    public Integer getAddressLevel() {
+        return addressLevel;
+    }
+
+    public void setAddressLevel(Integer addressLevel) {
+        this.addressLevel = addressLevel;
     }
 }
